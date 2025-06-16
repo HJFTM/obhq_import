@@ -1,0 +1,42 @@
+name: Export Observable Notebooks
+
+on:
+  schedule:
+    - cron: '0 6 * * *'    # svaki dan u 6:00 ujutro
+  workflow_dispatch:
+
+jobs:
+  fetch-notebooks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install Observable CLI
+        run: npm install -g @observablehq/cli
+
+      - name: Fetch notebook1
+        run: observablehq fetch @ftm/naslovnica > src/notebooks/naslovnica.ojs
+
+      - name: Fetch notebook2
+        run: observablehq fetch @ftm/tragovi-kroz-vrijeme > src/notebooks/tragovi-kroz-vrijeme.ojs
+
+      - name: Commit & push changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add src/notebooks/
+          git diff --quiet && git diff --staged --quiet || (
+            git commit -m "Update Observable notebooks"
+            git push
+          )
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
