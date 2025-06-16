@@ -4,31 +4,39 @@ const path = require("path");
 const config = require("./config.json");
 
 const OUTPUT_DIR = path.join(__dirname, "notebooks");
-const cookie = process.env.OBSERVABLE_COOKIE;
 
 (async () => {
   await fs.ensureDir(OUTPUT_DIR);
   const browser = await puppeteer.launch({ headless: true, args: ["--no-sandbox"] });
   const page = await browser.newPage();
 
-await page.setCookie({
-  name: 'ab.storage.sessionId.751c046f-5dc2-4baf-b9b5-47d4099ce470',
-  value: process.env.OBSERVABLE_COOKIE,
-  domain: '.observablehq.com',
-  path: '/',
-  httpOnly: true,
-  secure: true,
-  sameSite: 'Lax',
-});
-
-
   for (const nb of config.notebooks) {
-    console.log(`⏬ Downloading ${nb.url}...`);
+    console.log(`Exporting ${nb.url}...`);
     await page.goto(nb.url + "?embed=1", { waitUntil: "networkidle2" });
-    const html = await page.content();
+
+    // Dohvati samo div sa notebookom
+    const notebookHTML = await page.evaluate(() => {
+      const el = document.querySelector("observablehq-notebook");
+      return el ? el.outerHTML : document.body.innerHTML;
+    });
+
+    // Kreiraj standalone HTML s Observable Runtime CDN-om
+    const fullHTML = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>${nb.name}</title>
+  <script src="https://cdn.jsdelivr.net/npm/@observablehq/runtime@4/dist/runtime.min.js"></script>
+</head>
+<body>
+  ${notebookHTML}
+</body>
+</html>`;
+
     const filePath = path.join(OUTPUT_DIR, `${nb.name}.html`);
-    await fs.writeFile(filePath, html);
-    console.log(`✅ Saved to ${filePath}`);
+    await fs.writeFile(filePath, fullHTML);
+    console.log(`Saved ${filePath}`);
   }
 
   await browser.close();
