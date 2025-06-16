@@ -11,14 +11,15 @@ const cookie = process.env.OBSERVABLE_COOKIE;
   const browser = await puppeteer.launch({ headless: true, args: ["--no-sandbox"] });
   const page = await browser.newPage();
 
-  await page.setCookie({
-    name: "__Host-session",
-    value: cookie,
-    domain: ".observablehq.com",
-    path: "/",
-    httpOnly: true,
-    secure: true
-  });
+await page.setCookie({
+  name: '__Host-session',
+  value: process.env.OBSERVABLE_COOKIE,
+  domain: 'observablehq.com',
+  path: '/',
+  httpOnly: true,
+  secure: true,
+});
+
 
   for (const nb of config.notebooks) {
     console.log(`⏬ Downloading ${nb.url}...`);
