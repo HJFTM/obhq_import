@@ -1,4 +1,4 @@
-name: Export Observable Notebooks
+name: Export HJTM Notebooks
 
 on:
   schedule:
