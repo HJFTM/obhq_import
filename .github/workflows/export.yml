@@ -33,3 +33,5 @@ jobs:
           git add notebooks/
           git commit -m "Update Observable notebooks"
           git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
