@@ -1,4 +1,11 @@
-jobs:
+name: Export Observable Notebooks
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # svaki dan u 6:00 ujutro
+  workflow_dispatch:
+  
+  jobs:
   export:
     runs-on: ubuntu-latest
 
