@@ -12,12 +12,13 @@ const cookie = process.env.OBSERVABLE_COOKIE;
   const page = await browser.newPage();
 
 await page.setCookie({
-  name: '__Host-session',
+  name: 'ab.storage.sessionId.751c046f-5dc2-4baf-b9b5-47d4099ce470',
   value: process.env.OBSERVABLE_COOKIE,
-  domain: 'observablehq.com',
+  domain: '.observablehq.com',
   path: '/',
   httpOnly: true,
   secure: true,
+  sameSite: 'Lax',
 });
 
 
