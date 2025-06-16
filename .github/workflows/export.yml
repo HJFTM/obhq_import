@@ -4,16 +4,14 @@ on:
   schedule:
     - cron: '0 6 * * *'  # svaki dan u 6:00 ujutro
   workflow_dispatch:
-  
-  jobs:
+
+jobs:
   export:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -35,5 +33,6 @@ on:
           git add notebooks/
           git commit -m "Update Observable notebooks"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/HJFTM/obhq_import.git
+
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
