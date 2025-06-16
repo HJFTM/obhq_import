@@ -1,0 +1,35 @@
+name: Export Observable Notebooks
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # svaki dan u 6:00 ujutro
+  workflow_dispatch:
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install puppeteer fs-extra
+
+      - name: Export notebooks
+        run: node export.js
+        env:
+          OBSERVABLE_COOKIE: ${{ secrets.OBSERVABLE_COOKIE }}
+
+      - name: Commit & push notebooks
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add notebooks/
+          git commit -m "Update Observable notebooks"
+          git push
